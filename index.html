@@ -3,972 +3,532 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advit — Builder at 14</title>
+<title>Advit — Young Builder & Robotics Maker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --card: #16161f;
-    --accent: #7fff6a;
-    --accent2: #6af0ff;
-    --accent3: #ff6a9b;
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --border: rgba(255,255,255,0.07);
-  }
+:root {
+  --bg:#020508; --surface:#050c14; --card:#080f18; --card2:#0a1520;
+  --blue:#00aaff; --blue2:#0066cc; --blue3:#003d7a;
+  --blueglow:rgba(0,170,255,0.15); --cyan:#00e5ff;
+  --text:#cce8ff; --muted:#4a7a99;
+  --border:rgba(0,170,255,0.12); --brite:rgba(0,170,255,0.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-weight:400;overflow-x:hidden;cursor:none;}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+#cur{width:10px;height:10px;background:var(--blue);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--blue);}
+#cur-ring{width:36px;height:36px;border:1px solid rgba(0,170,255,0.5);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s;}
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
-  html { scroll-behavior: smooth; }
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px 48px;display:flex;justify-content:space-between;align-items:center;background:rgba(2,5,8,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--blue);letter-spacing:0.08em;text-shadow:0 0 20px rgba(0,170,255,0.6);}
+.nav-logo span{color:var(--cyan);}
+.nav-links{display:flex;gap:36px;list-style:none;}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s,text-shadow 0.2s;}
+.nav-links a:hover{color:var(--blue);text-shadow:0 0 12px rgba(0,170,255,0.6);}
+.nav-status{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.1em;}
+.ndot{width:6px;height:6px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;animation:pulse 2s infinite;}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    overflow-x: hidden;
-    cursor: none;
-  }
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 48px 80px;position:relative;z-index:1;}
+.hero-inner{max-width:1300px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.h-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--blue);margin-bottom:20px;display:flex;align-items:center;gap:12px;opacity:0;animation:fadeUp 0.7s 0.2s forwards;}
+.h-eyebrow::before{content:'';width:28px;height:1px;background:var(--blue);box-shadow:0 0 8px var(--blue);}
+.h-name{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(52px,7vw,96px);line-height:1;letter-spacing:-0.02em;margin-bottom:8px;opacity:0;animation:fadeUp 0.7s 0.35s forwards;color:#fff;text-shadow:0 0 40px rgba(0,170,255,0.4);}
+.h-tag{font-family:'Orbitron',monospace;font-weight:400;font-size:clamp(13px,1.6vw,19px);color:var(--blue);letter-spacing:0.1em;margin-bottom:32px;opacity:0;animation:fadeUp 0.7s 0.45s forwards;}
+.h-desc{font-size:17px;line-height:1.8;color:var(--muted);margin-bottom:40px;max-width:480px;opacity:0;animation:fadeUp 0.7s 0.55s forwards;}
+.h-desc strong{color:var(--text);font-weight:600;}
+.h-btns{display:flex;gap:16px;opacity:0;animation:fadeUp 0.7s 0.65s forwards;}
+.btn-p{display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:#000;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;padding:14px 28px;cursor:none;transition:box-shadow 0.2s,transform 0.2s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));}
+.btn-p:hover{box-shadow:0 0 30px rgba(0,170,255,0.6);transform:translateY(-2px);}
+.btn-s{display:inline-flex;align-items:center;gap:10px;background:transparent;color:var(--blue);font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;padding:14px 28px;border:1px solid var(--brite);cursor:none;transition:background 0.2s,box-shadow 0.2s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));}
+.btn-s:hover{background:var(--blueglow);box-shadow:0 0 20px rgba(0,170,255,0.2);}
 
-  /* Custom cursor */
-  .cursor {
-    width: 12px; height: 12px;
-    background: var(--accent);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.15s ease, background 0.2s;
-    transform: translate(-50%, -50%);
-  }
-  .cursor-ring {
-    width: 40px; height: 40px;
-    border: 1px solid rgba(127,255,106,0.4);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9998;
-    transition: transform 0.35s ease, width 0.2s, height 0.2s;
-    transform: translate(-50%, -50%);
-  }
+.terminal{background:var(--card);border:1px solid var(--brite);overflow:hidden;box-shadow:0 0 60px rgba(0,170,255,0.1),inset 0 1px 0 rgba(0,170,255,0.2);opacity:0;animation:fadeUp 0.7s 0.5s forwards;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));}
+.t-bar{background:var(--card2);padding:12px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+.td{width:10px;height:10px;border-radius:50%;}
+.t-title{margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.t-body{padding:24px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2;}
+.tl{display:block;color:var(--muted);}
+.tp{color:var(--blue);}
+.tc{color:var(--text);}
+.to{color:#00ff88;padding-left:20px;}
+.to.w{color:#ffcc00;}
+.to.i{color:var(--cyan);}
+.tcur{display:inline-block;width:8px;height:14px;background:var(--blue);animation:blink 1s infinite;vertical-align:middle;}
 
-  /* Noise overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.6;
-  }
+.marquee-wrap{border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:14px 0;position:relative;z-index:1;}
+.marquee-track{display:flex;animation:marquee 25s linear infinite;width:max-content;}
+.mi{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);white-space:nowrap;padding:0 40px;display:flex;align-items:center;}
+.mi::after{content:'//';color:var(--blue);font-size:10px;margin-left:40px;}
 
-  /* Grid background */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(127,255,106,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(127,255,106,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-    z-index: 0;
-  }
+.stats-row{max-width:1300px;margin:0 auto;padding:0 48px;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;position:relative;z-index:1;}
+.stat-box{background:var(--card);border:1px solid var(--border);padding:32px;text-align:center;position:relative;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;}
+.stat-box:hover{border-color:var(--brite);box-shadow:0 0 30px rgba(0,170,255,0.1);}
+.stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--blue),transparent);opacity:0;transition:opacity 0.3s;}
+.stat-box:hover::before{opacity:1;}
+.sn{font-family:'Orbitron',monospace;font-weight:900;font-size:48px;color:var(--blue);line-height:1;text-shadow:0 0 20px rgba(0,170,255,0.5);}
+.sl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-top:6px;}
 
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(20px);
-    background: rgba(10,10,15,0.8);
-  }
-  .nav-logo {
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    color: var(--accent);
-    letter-spacing: 0.1em;
-  }
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-  }
-  .nav-links a {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--accent); }
+/* Section common */
+.section-wrap{position:relative;z-index:1;}
+.sh{max-width:1300px;margin:0 auto;padding:80px 48px 48px;display:flex;align-items:flex-end;justify-content:space-between;}
+.slabel{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;}
+.stitle{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(32px,4vw,52px);letter-spacing:-0.01em;color:#fff;text-shadow:0 0 30px rgba(0,170,255,0.3);}
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    padding: 120px 40px 80px;
-    position: relative;
-    z-index: 1;
-  }
-  .hero-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  .hero-tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.2s forwards;
-  }
-  .hero-tag::before {
-    content: '';
-    width: 32px; height: 1px;
-    background: var(--accent);
-  }
-  .hero-name {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(64px, 12vw, 140px);
-    line-height: 0.9;
-    letter-spacing: -0.02em;
-    margin-bottom: 32px;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.35s forwards;
-  }
-  .hero-name span {
-    display: block;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(255,255,255,0.2);
-  }
-  .hero-name em {
-    font-style: normal;
-    color: var(--accent);
-  }
-  .hero-desc {
-    font-size: 18px;
-    line-height: 1.7;
-    color: var(--muted);
-    max-width: 480px;
-    margin-bottom: 48px;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.5s forwards;
-  }
-  .hero-desc strong { color: var(--text); font-weight: 500; }
-  .hero-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--accent);
-    color: #0a0a0f;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    text-decoration: none;
-    padding: 16px 32px;
-    font-weight: 700;
-    transition: transform 0.2s, box-shadow 0.2s;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.65s forwards;
-  }
-  .hero-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(127,255,106,0.3);
-  }
-  .hero-scroll {
-    position: absolute;
-    bottom: 40px;
-    right: 40px;
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    writing-mode: vertical-rl;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    opacity: 0;
-    animation: fadeUp 0.8s 1s forwards;
-  }
-  .hero-scroll::after {
-    content: '';
-    width: 1px;
-    height: 60px;
-    background: linear-gradient(to bottom, var(--muted), transparent);
-  }
+/* Projects */
+.projects-wrap{max-width:1300px;margin:0 auto;padding:0 48px 80px;}
+.proj-featured{display:grid;grid-template-columns:1.2fr 1fr;gap:2px;margin-bottom:2px;border:1px solid var(--border);background:var(--card);transition:border-color 0.3s;}
+.proj-featured:hover{border-color:var(--brite);}
+.gallery-v{position:relative;overflow:hidden;height:440px;}
+.gallery-v img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.8s,filter 0.4s;filter:saturate(0.5) brightness(0.6);}
+.gallery-v img.active{opacity:1;}
+.gallery-v:hover img.active{filter:saturate(0.9) brightness(0.8);}
+.gdots{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:2;}
+.gdot{width:6px;height:6px;border-radius:50%;background:rgba(0,170,255,0.3);border:1px solid var(--blue);cursor:none;transition:background 0.2s;}
+.gdot.active{background:var(--blue);box-shadow:0 0 8px var(--blue);}
+.proj-body{padding:40px;display:flex;flex-direction:column;justify-content:center;}
+.pstatus{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;padding:5px 12px;border-radius:2px;margin-bottom:20px;width:fit-content;}
+.s-wip{background:rgba(255,100,100,0.1);color:#ff6464;border:1px solid rgba(255,100,100,0.3);}
+.s-done{background:rgba(0,255,136,0.1);color:#00ff88;border:1px solid rgba(0,255,136,0.3);}
+.s-prog{background:rgba(0,170,255,0.1);color:var(--blue);border:1px solid var(--brite);}
+.sdot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 2s infinite;}
+.pnum{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue);margin-bottom:8px;letter-spacing:0.1em;}
+.ptitle{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,2.5vw,36px);color:#fff;margin-bottom:16px;letter-spacing:-0.01em;text-shadow:0 0 20px rgba(0,170,255,0.3);}
+.pdesc{color:var(--muted);font-size:16px;line-height:1.8;margin-bottom:24px;}
+.pdesc strong{color:var(--text);}
+.ptags{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--border);color:var(--muted);border-radius:2px;transition:border-color 0.2s,color 0.2s;}
+.tag:hover{border-color:var(--blue);color:var(--blue);}
 
-  /* Stats bar */
-  .stats-bar {
-    position: relative;
-    z-index: 1;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 24px 40px;
-    display: flex;
-    gap: 0;
-    overflow: hidden;
-  }
-  .stat {
-    flex: 1;
-    padding: 0 40px;
-    border-right: 1px solid var(--border);
-    text-align: center;
-  }
-  .stat:first-child { padding-left: 0; }
-  .stat:last-child { border-right: none; }
-  .stat-num {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 40px;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .stat-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 4px;
-  }
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+.proj-card{background:var(--card);border:1px solid var(--border);overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;}
+.proj-card:hover{border-color:var(--brite);box-shadow:0 0 40px rgba(0,170,255,0.08);}
+.pimg-wrap{overflow:hidden;position:relative;height:200px;}
+.pimg-wrap img{width:100%;height:100%;object-fit:cover;filter:saturate(0.5) brightness(0.6);transition:filter 0.4s,transform 0.4s;display:block;}
+.proj-card:hover .pimg-wrap img{filter:saturate(0.9) brightness(0.8);transform:scale(1.03);}
+.click-hint{position:absolute;bottom:8px;right:12px;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(0,170,255,0.7);letter-spacing:0.1em;pointer-events:none;}
 
-  /* SECTION */
-  section {
-    position: relative;
-    z-index: 1;
-  }
-  .section-header {
-    padding: 80px 40px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-  .section-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 12px;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(36px, 5vw, 56px);
-    line-height: 1;
-    letter-spacing: -0.02em;
-  }
+.weather-visual{height:200px;background:linear-gradient(135deg,#020c1a,#041828,#020c1a);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.weather-visual::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 40% 50%,rgba(0,170,255,0.15) 0%,transparent 60%);}
+.wi{font-size:64px;filter:drop-shadow(0 0 20px rgba(0,170,255,0.5));z-index:1;}
+.wt{position:absolute;right:24px;bottom:16px;font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--blue);text-shadow:0 0 15px rgba(0,170,255,0.5);}
 
-  /* PROJECTS */
-  .projects-grid {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px 80px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2px;
-  }
-  .project-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.3s ease;
-    cursor: none;
-  }
-  .project-card:hover { transform: scale(1.01); z-index: 2; }
-  .project-card.featured {
-    grid-column: span 2;
-  }
-  .project-img {
-    width: 100%;
-    aspect-ratio: 16/9;
-    object-fit: cover;
-    display: block;
-    filter: grayscale(30%) brightness(0.7);
-    transition: filter 0.4s;
-  }
-  .project-card.featured .project-img {
-    aspect-ratio: 21/9;
-  }
-  .project-card:hover .project-img {
-    filter: grayscale(0%) brightness(0.85);
-  }
-  .project-body {
-    padding: 32px;
-  }
-  .project-status {
-    display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 2px;
-    margin-bottom: 16px;
-  }
-  .status-progress { background: rgba(255,106,155,0.15); color: var(--accent3); border: 1px solid rgba(255,106,155,0.3); }
-  .status-done { background: rgba(127,255,106,0.1); color: var(--accent); border: 1px solid rgba(127,255,106,0.2); }
-  .status-wip { background: rgba(106,240,255,0.1); color: var(--accent2); border: 1px solid rgba(106,240,255,0.2); }
-  .project-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .project-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 28px;
-    letter-spacing: -0.01em;
-    margin-bottom: 12px;
-  }
-  .project-desc {
-    color: var(--muted);
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 24px;
-  }
-  .project-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 5px 10px;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 2px;
-  }
+/* About */
+.about-wrap{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;z-index:1;overflow:hidden;}
+.about-wrap::before{content:'';position:absolute;right:-200px;top:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,170,255,0.05) 0%,transparent 70%);pointer-events:none;}
+.about-inner{max-width:1300px;margin:0 auto;padding:80px 48px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+.ah{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(36px,4vw,56px);line-height:1;letter-spacing:-0.01em;color:#fff;margin-bottom:28px;text-shadow:0 0 30px rgba(0,170,255,0.3);}
+.ah span{color:var(--blue);}
+.ap{color:var(--muted);font-size:17px;line-height:1.9;margin-bottom:16px;}
+.ap strong{color:var(--text);}
+.tl-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--blue);margin:32px 0 20px;}
+.tl-item{display:flex;gap:20px;margin-bottom:20px;}
+.tl-l{display:flex;flex-direction:column;align-items:center;min-width:40px;}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--blue);box-shadow:0 0 10px var(--blue);flex-shrink:0;margin-top:4px;}
+.tl-line{width:1px;flex:1;background:linear-gradient(to bottom,var(--brite),transparent);margin-top:4px;min-height:30px;}
+.tl-yr{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue);letter-spacing:0.1em;}
+.tl-ev{font-size:15px;color:var(--text);font-weight:600;}
+.tl-sub{font-size:13px;color:var(--muted);}
 
-  /* PROJECT IMAGES - multiple photos */
-  .project-gallery {
-    display: flex;
-    overflow-x: auto;
-    gap: 2px;
-    scrollbar-width: none;
-  }
-  .project-gallery::-webkit-scrollbar { display: none; }
-  .project-gallery img {
-    height: 220px;
-    width: auto;
-    object-fit: cover;
-    flex-shrink: 0;
-    filter: grayscale(30%) brightness(0.7);
-    transition: filter 0.4s;
-  }
-  .project-card:hover .project-gallery img { filter: grayscale(0%) brightness(0.85); }
+.sk-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--blue);margin-bottom:24px;}
+.sk-row{margin-bottom:20px;}
+.sk-top{display:flex;justify-content:space-between;margin-bottom:6px;}
+.sk-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;color:var(--text);letter-spacing:0.05em;}
+.sk-pct{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);}
+.sk-bar{height:3px;background:rgba(0,170,255,0.1);border-radius:2px;overflow:hidden;}
+.sk-fill{height:100%;background:linear-gradient(to right,var(--blue2),var(--blue),var(--cyan));border-radius:2px;width:0;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 8px rgba(0,170,255,0.4);}
+.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:32px;}
+.tool-box{background:var(--card2);border:1px solid var(--border);padding:14px 16px;}
+.tool-name{font-family:'Orbitron',monospace;font-size:11px;color:var(--blue);margin-bottom:4px;}
+.tool-sub{font-size:13px;color:var(--muted);}
 
-  /* ABOUT */
-  .about-section {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .about-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 80px 40px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-  }
-  .about-left {}
-  .about-big {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(40px, 5vw, 64px);
-    line-height: 1;
-    letter-spacing: -0.02em;
-    margin-bottom: 32px;
-  }
-  .about-big .highlight { color: var(--accent); }
-  .about-text {
-    color: var(--muted);
-    font-size: 16px;
-    line-height: 1.8;
-    margin-bottom: 16px;
-  }
-  .about-text strong { color: var(--text); }
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-top: 32px;
-  }
-  .skill-item {
-    border: 1px solid var(--border);
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .skill-item::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: var(--pct);
-    height: 2px;
-    background: var(--accent);
-  }
-  .skill-name {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .skill-sub {
-    font-size: 12px;
-    color: var(--muted);
-  }
+/* CAD */
+.cad-section{max-width:1300px;margin:0 auto;padding:0 48px 80px;}
+.cad-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+.cad-box{overflow:hidden;position:relative;}
+.cad-box img{width:100%;height:320px;object-fit:cover;filter:saturate(0.6) brightness(0.7) hue-rotate(10deg);display:block;transition:filter 0.4s,transform 0.4s;}
+.cad-box:hover img{filter:saturate(1) brightness(0.9) hue-rotate(0deg);transform:scale(1.02);}
+.cad-lbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(2,5,8,0.9),transparent);padding:24px 20px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);letter-spacing:0.1em;}
+.cad-info{background:var(--card);border:1px solid var(--border);padding:40px;display:flex;flex-direction:column;justify-content:center;}
+.cad-h{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:#fff;margin-bottom:14px;text-shadow:0 0 20px rgba(0,170,255,0.3);}
+.cad-p{color:var(--muted);font-size:16px;line-height:1.8;margin-bottom:12px;}
+.cad-p strong{color:var(--text);}
 
-  /* BLENDER CAD section */
-  .blender-strip {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    max-width: 1200px;
-    margin: 0 auto 80px;
-    padding: 0 40px;
-  }
-  .blender-img {
-    width: 100%;
-    aspect-ratio: 4/3;
-    object-fit: cover;
-    filter: grayscale(20%) brightness(0.75);
-    display: block;
-    transition: filter 0.3s;
-  }
-  .blender-img:hover { filter: grayscale(0%) brightness(0.9); }
-  .blender-info {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 48px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
+/* Cards */
+.cards-wrap{max-width:1300px;margin:0 auto;padding:0 48px 80px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.icard{background:var(--card);border:1px solid var(--border);padding:28px;transition:border-color 0.3s,box-shadow 0.3s,transform 0.2s;cursor:none;position:relative;overflow:hidden;}
+.icard::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(0,170,255,0.03));opacity:0;transition:opacity 0.3s;}
+.icard:hover{border-color:var(--brite);box-shadow:0 0 30px rgba(0,170,255,0.1);transform:translateY(-4px);}
+.icard:hover::after{opacity:1;}
+.ic-icon{font-size:32px;margin-bottom:16px;}
+.ic-t{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;}
+.ic-d{font-size:14px;color:var(--muted);line-height:1.7;}
 
-  /* CONTACT */
-  .contact-section {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 80px 40px 120px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 40px;
-  }
-  .contact-left {}
-  .contact-big {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(48px, 7vw, 96px);
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    margin-bottom: 24px;
-  }
-  .contact-big span { color: var(--accent); }
-  .contact-text {
-    font-size: 16px;
-    color: var(--muted);
-    line-height: 1.7;
-    max-width: 400px;
-  }
-  .contact-links {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .contact-link {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 28px;
-    border: 1px solid var(--border);
-    text-decoration: none;
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-    transition: border-color 0.2s, background 0.2s, color 0.2s;
-    min-width: 280px;
-  }
-  .contact-link:hover {
-    border-color: var(--accent);
-    background: rgba(127,255,106,0.05);
-    color: var(--accent);
-  }
-  .contact-link-icon {
-    font-size: 20px;
-  }
+/* Contact */
+.contact-wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:80px 48px 120px;}
+.contact-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:60px;align-items:center;}
+.cbig{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(44px,6vw,80px);line-height:1;letter-spacing:-0.02em;color:#fff;margin-bottom:20px;text-shadow:0 0 40px rgba(0,170,255,0.3);}
+.cbig span{color:var(--blue);}
+.csub{font-size:17px;color:var(--muted);line-height:1.8;margin-bottom:32px;}
+.cbox{background:var(--card);border:1px solid var(--border);padding:32px;box-shadow:0 0 60px rgba(0,170,255,0.05);}
+.citem{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);transition:color 0.2s;}
+.citem:last-child{border-bottom:none;}
+.citem:hover{color:var(--blue);}
+.ci-icon{font-size:20px;width:40px;text-align:center;flex-shrink:0;}
+.ci-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.ci-val{font-size:15px;font-weight:600;}
 
-  /* FOOTER */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 24px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-  }
-  .footer-copy {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-  }
-  .footer-made {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-  }
-  .footer-made span { color: var(--accent); }
+footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;background:var(--surface);}
+.flogo{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--blue);}
+.fcopy{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.1em;}
 
-  /* Animations */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.d1{transition-delay:0.1s;}.d2{transition-delay:0.2s;}.d3{transition-delay:0.3s;}
 
-  .reveal {
-    opacity: 0;
-    transform: translateY(32px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.scanline{position:fixed;inset:0;z-index:1000;pointer-events:none;background:linear-gradient(to bottom,transparent 50%,rgba(0,170,255,0.01) 50%);background-size:100% 4px;opacity:0.3;}
 
-  /* Marquee */
-  .marquee-wrap {
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-    padding: 16px 0;
-    position: relative;
-    z-index: 1;
-  }
-  .marquee-track {
-    display: flex;
-    gap: 48px;
-    animation: marquee 20s linear infinite;
-    width: max-content;
-  }
-  .marquee-item {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 13px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 48px;
-  }
-  .marquee-item::after {
-    content: '◆';
-    color: var(--accent);
-    font-size: 8px;
-  }
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
-  /* Glowing dot */
-  .dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent); }
-    50% { opacity: 0.6; box-shadow: 0 0 16px var(--accent); }
-  }
-
-  @media (max-width: 768px) {
-    nav { padding: 16px 20px; }
-    .nav-links { display: none; }
-    .hero { padding: 100px 20px 60px; }
-    .stats-bar { padding: 20px; flex-wrap: wrap; }
-    .stat { flex: 1 1 40%; padding: 16px; border-right: none; border-bottom: 1px solid var(--border); }
-    .projects-grid { grid-template-columns: 1fr; padding: 0 20px 60px; }
-    .project-card.featured { grid-column: span 1; }
-    .about-inner { grid-template-columns: 1fr; gap: 40px; padding: 60px 20px; }
-    .blender-strip { grid-template-columns: 1fr; padding: 0 20px; }
-    .contact-section { flex-direction: column; padding: 60px 20px; }
-    .section-header { padding: 60px 20px 32px; flex-direction: column; align-items: flex-start; gap: 16px; }
-    footer { flex-direction: column; gap: 8px; padding: 20px; text-align: center; }
-  }
+@media(max-width:900px){
+  nav{padding:14px 20px;}
+  .nav-links{display:none;}
+  .hero{padding:90px 20px 60px;}
+  .hero-inner{grid-template-columns:1fr;}
+  .terminal{display:none;}
+  .stats-row{grid-template-columns:repeat(2,1fr);padding:0 20px;}
+  .proj-featured{grid-template-columns:1fr;}
+  .gallery-v{height:240px;}
+  .proj-grid{grid-template-columns:1fr;}
+  .about-inner{grid-template-columns:1fr;gap:40px;padding:60px 20px;}
+  .cad-grid{grid-template-columns:1fr;}
+  .cards-grid{grid-template-columns:1fr;}
+  .contact-grid{grid-template-columns:1fr;}
+  .sh,.cad-section,.cards-wrap,.contact-wrap,.projects-wrap{padding-left:20px;padding-right:20px;}
+  footer{flex-direction:column;gap:8px;padding:20px;text-align:center;}
+  .stats-row{margin-bottom:40px;}
+}
 </style>
 </head>
 <body>
+<div class="scanline"></div>
+<canvas id="bgCanvas"></canvas>
+<div id="cur"></div>
+<div id="cur-ring"></div>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
-<!-- NAV -->
 <nav>
-  <div class="nav-logo">advit.dev</div>
+  <div class="nav-logo">ADV<span>IT</span>.DEV</div>
   <ul class="nav-links">
     <li><a href="#projects">Projects</a></li>
     <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <div class="nav-status"><div class="ndot"></div> Building new things</div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-tag"><span class="dot"></span> Available for collabs &amp; competitions</div>
-    <h1 class="hero-name">
-      Advit
-      <span>Builds</span>
-      <em>Robots.</em>
-    </h1>
-    <p class="hero-desc">
-      <strong>14 years old.</strong> Designing robots in Blender, writing firmware in C++, and shipping hardware projects that actually work. Based in reality, building the future.
-    </p>
-    <a href="#projects" class="hero-cta">
-      View Projects
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </a>
+    <div>
+      <div class="h-eyebrow">// Student · Builder · Maker</div>
+      <h1 class="h-name">ADVIT</h1>
+      <div class="h-tag">Age 14 &nbsp;·&nbsp; Robotics &amp; Hardware</div>
+      <p class="h-desc">
+        I design robots in <strong>Blender</strong>, print them, wire them, and write the firmware myself. From a walking quadruped to AI-powered devices — I build projects that exist in the physical world, not just a screen.<br><br>
+        Started coding at <strong>11</strong>, got into 3D CAD at <strong>12</strong>, and haven't stopped since.
+      </p>
+      <div class="h-btns">
+        <a href="#projects" class="btn-p">View Projects ↓</a>
+        <a href="#contact" class="btn-s">Get in Touch</a>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="t-bar">
+        <div class="td" style="background:#ff5f57"></div>
+        <div class="td" style="background:#febc2e"></div>
+        <div class="td" style="background:#28c840"></div>
+        <span class="t-title">advit@portfolio ~ terminal</span>
+      </div>
+      <div class="t-body">
+        <span class="tl"><span class="tp">$ </span><span class="tc">whoami</span></span>
+        <span class="tl to">Advit — 14 y/o builder from Hillsboro, OR</span>
+        <span class="tl">&nbsp;</span>
+        <span class="tl"><span class="tp">$ </span><span class="tc">ls ./projects</span></span>
+        <span class="tl to">quadbot/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[IN_PROGRESS 🔴]</span>
+        <span class="tl to">robot-arm/ &nbsp;&nbsp;&nbsp;&nbsp;[COMPLETE ✓]</span>
+        <span class="tl to">ai-assistant/ &nbsp;[IN_PROGRESS 🔵]</span>
+        <span class="tl to">weather-check/ [COMPLETE ✓]</span>
+        <span class="tl">&nbsp;</span>
+        <span class="tl"><span class="tp">$ </span><span class="tc">cat skills.txt</span></span>
+        <span class="tl to i">Blender · Arduino · C++ · Python</span>
+        <span class="tl to i">3D Print · Servo Control · AI APIs</span>
+        <span class="tl">&nbsp;</span>
+        <span class="tl"><span class="tp">$ </span><span class="tc">cat status.txt</span></span>
+        <span class="tl to w">⚡ Currently deep in QuadBot v1</span>
+        <span class="tl">&nbsp;</span>
+        <span class="tl"><span class="tp">$ </span><span class="tcur"></span></span>
+      </div>
+    </div>
   </div>
-  <div class="hero-scroll">Scroll down</div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar reveal">
-  <div class="stat">
-    <div class="stat-num">14</div>
-    <div class="stat-label">Years Old</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">4+</div>
-    <div class="stat-label">Projects Built</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">∞</div>
-    <div class="stat-label">Curiosity</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num">3D</div>
-    <div class="stat-label">CAD & Modeling</div>
-  </div>
-</div>
-
-<!-- MARQUEE -->
 <div class="marquee-wrap">
   <div class="marquee-track">
-    <div class="marquee-item">Blender CAD</div>
-    <div class="marquee-item">Arduino / C++</div>
-    <div class="marquee-item">Servo Control</div>
-    <div class="marquee-item">3D Printing</div>
-    <div class="marquee-item">AI & APIs</div>
-    <div class="marquee-item">Electronics</div>
-    <div class="marquee-item">Python</div>
-    <div class="marquee-item">Blender CAD</div>
-    <div class="marquee-item">Arduino / C++</div>
-    <div class="marquee-item">Servo Control</div>
-    <div class="marquee-item">3D Printing</div>
-    <div class="marquee-item">AI & APIs</div>
-    <div class="marquee-item">Electronics</div>
-    <div class="marquee-item">Python</div>
+    <div class="mi">Blender CAD</div><div class="mi">Arduino C++</div><div class="mi">Servo Systems</div>
+    <div class="mi">3D Printing</div><div class="mi">AI Integration</div><div class="mi">Quadruped Robotics</div>
+    <div class="mi">Embedded Systems</div><div class="mi">Python Scripting</div>
+    <div class="mi">Blender CAD</div><div class="mi">Arduino C++</div><div class="mi">Servo Systems</div>
+    <div class="mi">3D Printing</div><div class="mi">AI Integration</div><div class="mi">Quadruped Robotics</div>
+    <div class="mi">Embedded Systems</div><div class="mi">Python Scripting</div>
   </div>
 </div>
 
-<!-- PROJECTS -->
-<section id="projects">
-  <div class="section-header reveal">
-    <div>
-      <div class="section-label">Selected Work</div>
-      <h2 class="section-title">Projects</h2>
-    </div>
+<div class="stats-row reveal" style="margin-top:2px;margin-bottom:80px;">
+  <div class="stat-box"><div class="sn" data-count="14">0</div><div class="sl">Years Old</div></div>
+  <div class="stat-box"><div class="sn" data-count="4">0</div><div class="sl">Projects Built</div></div>
+  <div class="stat-box"><div class="sn" data-count="121">0</div><div class="sl">Blender Objects (QuadBot)</div></div>
+  <div class="stat-box"><div class="sn" data-count="3">0</div><div class="sl">Years of Making</div></div>
+</div>
+
+<section id="projects" class="section-wrap">
+  <div class="sh reveal">
+    <div><div class="slabel">// Selected Work</div><h2 class="stitle">Projects</h2></div>
   </div>
+  <div class="projects-wrap">
 
-  <div class="projects-grid">
-
-    <!-- QuadBot - Featured -->
-    <div class="project-card featured reveal">
-      <div class="project-gallery">
-        <img src="Screenshot_2026-05-15_223234.png" alt="QuadBot Blender CAD">
-        <img src="Screenshot_2026-05-15_222737.png" alt="QuadBot body Blender">
-        <img src="WhatsApp_Image_2026-05-15_at_10_30_02_PM.jpeg" alt="QuadBot real build">
-        <img src="WhatsApp_Image_2026-05-15_at_10_30_02_PM__1_.jpeg" alt="QuadBot side">
-        <img src="WhatsApp_Image_2026-05-15_at_10_30_03_PM.jpeg" alt="QuadBot top">
+    <!-- QUADBOT -->
+    <div class="proj-featured reveal">
+      <div class="gallery-v" id="qbG">
+        <img src="Screenshot 2026-05-15 223234.png" alt="QuadBot Blender model" class="active">
+        <img src="Screenshot 2026-05-15 222737.png" alt="QuadBot body">
+        <img src="WhatsApp Image 2026-05-15 at 10.30.02 PM.jpeg" alt="QuadBot physical build">
+        <img src="WhatsApp Image 2026-05-15 at 10.30.02 PM (1).jpeg" alt="QuadBot side">
+        <img src="WhatsApp Image 2026-05-15 at 10.30.03 PM.jpeg" alt="QuadBot top view">
+        <div class="gdots" id="qbDots"></div>
       </div>
-      <div class="project-body">
-        <span class="project-status status-progress">🔴 In Progress</span>
-        <div class="project-num">01 —</div>
-        <h3 class="project-title">QuadBot</h3>
-        <p class="project-desc">A four-legged walking robot fully designed from scratch in Blender 5.0. The chassis, servo mounts, and leg mechanisms were all CAD'd and 3D printed. Powered by multiple servo motors, an Arduino, and a 9V LiION battery — with LED strip lighting because why not. Currently in active development.</p>
-        <div class="project-tags">
-          <span class="tag">Blender 5.0</span>
-          <span class="tag">3D Printing</span>
-          <span class="tag">Arduino</span>
-          <span class="tag">Servo Motors</span>
-          <span class="tag">C++</span>
-          <span class="tag">LED Strip</span>
+      <div class="proj-body">
+        <div class="pstatus s-wip"><div class="sdot"></div>In Progress</div>
+        <div class="pnum">01 // QUADBOT</div>
+        <h3 class="ptitle">QuadBot</h3>
+        <p class="pdesc">A <strong>four-legged walking robot</strong> designed entirely from scratch in Blender 5.0. Every component — body panels, leg linkages, servo brackets, wire channels — modeled to real servo dimensions before a single part was printed.<br><br>3D-printed frame, multiple servos driven by Arduino, 9V LiION battery, LED strip lighting. Currently tuning gait algorithms to get smooth walking.</p>
+        <div class="ptags">
+          <span class="tag">Blender 5.0</span><span class="tag">3D Printing</span><span class="tag">Arduino</span>
+          <span class="tag">Servo Motors</span><span class="tag">C++</span><span class="tag">LED Strip</span><span class="tag">Gait Control</span>
         </div>
       </div>
     </div>
 
-    <!-- Robot Arm -->
-    <div class="project-card reveal">
-      <div class="project-gallery">
-        <img src="WhatsApp_Image_2026-05-15_at_10_17_48_PM.jpeg" alt="Robot Arm">
-        <img src="WhatsApp_Image_2026-05-15_at_10_17_48_PM__1_.jpeg" alt="Robot Arm close">
-        <img src="WhatsApp_Image_2026-05-15_at_10_17_49_PM.jpeg" alt="Robot Arm side">
-        <img src="WhatsApp_Image_2026-05-15_at_10_17_48_PM__2_.jpeg" alt="Robot Arm angle">
-      </div>
-      <div class="project-body">
-        <span class="project-status status-done">✅ Completed</span>
-        <div class="project-num">02 —</div>
-        <h3 class="project-title">Robot Arm</h3>
-        <p class="project-desc">A multi-DOF robotic arm with 3D-printed linkages and a gripper, controlled via servo motors. The arm can reach, grab, and position objects with precision — built and iterated through multiple physical prototypes.</p>
-        <div class="project-tags">
-          <span class="tag">3D Printing</span>
-          <span class="tag">Servo Motors</span>
-          <span class="tag">Arduino</span>
-          <span class="tag">Inverse Kinematics</span>
+    <div class="proj-grid" style="margin-top:2px;">
+
+      <!-- Robot Arm -->
+      <div class="proj-card reveal">
+        <div class="pimg-wrap" id="armG" style="cursor:none;">
+          <img src="WhatsApp Image 2026-05-15 at 10.17.48 PM.jpeg" alt="Robot Arm">
+          <div class="click-hint">CLICK TO CYCLE ›</div>
+        </div>
+        <div class="proj-body">
+          <div class="pstatus s-done"><div class="sdot"></div>Completed</div>
+          <div class="pnum">02 // ROBOT ARM</div>
+          <h3 class="ptitle">Robot Arm</h3>
+          <p class="pdesc">A <strong>multi-DOF robotic arm</strong> with fully 3D-printed linkages and working gripper. Multiple iterations to get reach and grip force right. Taught me the most about servo torque, joint design, and how everything flexes under load.</p>
+          <div class="ptags"><span class="tag">3D Printing</span><span class="tag">Servo Motors</span><span class="tag">Arduino</span><span class="tag">Kinematics</span></div>
         </div>
       </div>
-    </div>
 
-    <!-- AI Assistant -->
-    <div class="project-card reveal">
-      <div class="project-gallery">
-        <img src="WhatsApp_Image_2026-05-15_at_10_17_49_PM__1_.jpeg" alt="AI Assistant build">
-      </div>
-      <div class="project-body">
-        <span class="project-status status-wip">🔵 In Progress</span>
-        <div class="project-num">03 —</div>
-        <h3 class="project-title">AI Assistant</h3>
-        <p class="project-desc">A physical AI assistant device housed in a custom 3D-printed enclosure with an LCD display, speaker, and status LEDs. Integrates with an LLM API to answer questions, show responses on screen, and provide audio feedback — a desktop companion with brains.</p>
-        <div class="project-tags">
-          <span class="tag">AI / LLM API</span>
-          <span class="tag">Arduino</span>
-          <span class="tag">LCD Display</span>
-          <span class="tag">Speaker</span>
-          <span class="tag">3D Printing</span>
-          <span class="tag">Python</span>
+      <!-- AI Assistant -->
+      <div class="proj-card reveal d1">
+        <div class="pimg-wrap">
+          <img src="WhatsApp Image 2026-05-15 at 10.17.49 PM (1).jpeg" alt="AI Assistant device">
+        </div>
+        <div class="proj-body">
+          <div class="pstatus s-prog"><div class="sdot"></div>In Progress</div>
+          <div class="pnum">03 // AI ASSISTANT</div>
+          <h3 class="ptitle">AI Assistant</h3>
+          <p class="pdesc">A <strong>physical AI assistant</strong> in a custom 3D-printed enclosure with LCD screen, speaker, and LEDs. Connects to an LLM API for real responses. Goal: a sci-fi desktop companion that lives in the real world.</p>
+          <div class="ptags"><span class="tag">LLM API</span><span class="tag">Arduino</span><span class="tag">LCD Display</span><span class="tag">Speaker</span><span class="tag">Python</span><span class="tag">3D Print</span></div>
         </div>
       </div>
-    </div>
 
-    <!-- Weather Checker -->
-    <div class="project-card reveal">
-      <div class="project-body" style="height:100%; display:flex; flex-direction:column; justify-content:center; min-height: 320px;">
-        <span class="project-status status-done">✅ Completed</span>
-        <div class="project-num">04 —</div>
-        <h3 class="project-title">Weather Checker</h3>
-        <p class="project-desc">A weather station that fetches live meteorological data via API and displays temperature, humidity, and conditions on a physical device with a custom enclosure. Simple, useful, and fully self-built — one of the first projects that combined software APIs with hardware output.</p>
-        <div class="project-tags">
-          <span class="tag">Weather API</span>
-          <span class="tag">Python</span>
-          <span class="tag">Arduino</span>
-          <span class="tag">OLED Display</span>
-          <span class="tag">3D Printing</span>
+      <!-- Weather Checker -->
+      <div class="proj-card reveal d2" style="grid-column:span 2;">
+        <div class="weather-visual">
+          <div class="wi">🌤️</div><div class="wt">72°F</div>
+        </div>
+        <div class="proj-body">
+          <div class="pstatus s-done"><div class="sdot"></div>Completed</div>
+          <div class="pnum">04 // WEATHER CHECKER</div>
+          <h3 class="ptitle">Weather Checker</h3>
+          <p class="pdesc">One of my first projects combining <strong>software APIs with real hardware output</strong>. Pulls live weather data and displays temperature, humidity, and conditions on an OLED screen inside a custom-built device. This was the project that made me realize software and hardware are better together.</p>
+          <div class="ptags"><span class="tag">Weather API</span><span class="tag">Python</span><span class="tag">Arduino</span><span class="tag">OLED Display</span><span class="tag">3D Printing</span></div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </section>
 
-<!-- ABOUT -->
-<section id="about" class="about-section">
+<section id="about" class="about-wrap">
   <div class="about-inner">
-    <div class="about-left reveal">
-      <h2 class="about-big">
-        Hey, I'm<br>
-        <span class="highlight">Advit.</span>
-      </h2>
-      <p class="about-text">
-        I'm <strong>14 years old</strong> and I build things — robots, AI devices, mechanical arms, and whatever else I can dream up. I design parts in <strong>Blender</strong>, print them, wire them, and code the firmware myself.
-      </p>
-      <p class="about-text">
-        I don't wait until I'm "old enough." I learn by doing, and most of the time, by breaking things first. Every project on this page was started from scratch — no kits, just curiosity.
-      </p>
-      <p class="about-text">
-        Currently deep in <strong>QuadBot</strong> — a walking robot I'm designing joint by joint — and building an AI assistant that actually lives in the real world, not just a browser tab.
-      </p>
+    <div class="reveal">
+      <h2 class="ah">Hey, I'm<br><span>Advit.</span></h2>
+      <p class="ap">I'm <strong>14 years old</strong> and I've been building things since I first touched an Arduino at age 11. I go to school in Hillsboro and spend most of my free time surrounded by wires, filament spools, and whatever half-assembled robot I'm working on.</p>
+      <p class="ap">I don't do kits. Every project on this page was designed from scratch — the CAD, the code, the wiring. When something doesn't work, I figure out why. That's the whole point.</p>
+      <p class="ap">Right now my biggest obsession is <strong>QuadBot</strong> — getting a 4-legged robot to walk smoothly is way harder than it looks. I'm also building a physical AI assistant that I want to feel like it's straight out of a sci-fi movie.</p>
+      <p class="ap">Long-term goal: study robotics engineering and build machines that do things humans can't or won't.</p>
+      <div class="tl-title">// Journey so far</div>
+      <div class="tl-item"><div class="tl-l"><div class="tl-dot"></div><div class="tl-line"></div></div><div><div class="tl-yr">2023</div><div class="tl-ev">First Arduino project</div><div class="tl-sub">LED blink → sensors → never stopped</div></div></div>
+      <div class="tl-item"><div class="tl-l"><div class="tl-dot"></div><div class="tl-line"></div></div><div><div class="tl-yr">2024</div><div class="tl-ev">Weather Checker + Robot Arm</div><div class="tl-sub">First API integration & servo mechanics</div></div></div>
+      <div class="tl-item"><div class="tl-l"><div class="tl-dot"></div><div class="tl-line"></div></div><div><div class="tl-yr">2025</div><div class="tl-ev">Started Blender CAD</div><div class="tl-sub">Designing full assemblies before printing</div></div></div>
+      <div class="tl-item"><div class="tl-l"><div class="tl-dot"></div></div><div><div class="tl-yr">2026</div><div class="tl-ev">QuadBot + AI Assistant</div><div class="tl-sub">Most ambitious builds yet — both in progress</div></div></div>
     </div>
-    <div class="about-right reveal">
-      <div class="skills-grid">
-        <div class="skill-item" style="--pct: 90%">
-          <div class="skill-name">Blender / CAD</div>
-          <div class="skill-sub">3D modeling & design</div>
+
+    <div id="skills" class="reveal d1">
+      <div class="sk-title">// Skills & Proficiency</div>
+      <div class="sk-row"><div class="sk-top"><span class="sk-name">Blender 3D / CAD</span><span class="sk-pct">90%</span></div><div class="sk-bar"><div class="sk-fill" data-w="90"></div></div></div>
+      <div class="sk-row"><div class="sk-top"><span class="sk-name">Arduino / C++</span><span class="sk-pct">85%</span></div><div class="sk-bar"><div class="sk-fill" data-w="85"></div></div></div>
+      <div class="sk-row"><div class="sk-top"><span class="sk-name">3D Printing (FDM)</span><span class="sk-pct">88%</span></div><div class="sk-bar"><div class="sk-fill" data-w="88"></div></div></div>
+      <div class="sk-row"><div class="sk-top"><span class="sk-name">Python</span><span class="sk-pct">78%</span></div><div class="sk-bar"><div class="sk-fill" data-w="78"></div></div></div>
+      <div class="sk-row"><div class="sk-top"><span class="sk-name">Electronics & Wiring</span><span class="sk-pct">75%</span></div><div class="sk-bar"><div class="sk-fill" data-w="75"></div></div></div>
+      <div class="sk-row"><div class="sk-top"><span class="sk-name">Servo & Motor Control</span><span class="sk-pct">80%</span></div><div class="sk-bar"><div class="sk-fill" data-w="80"></div></div></div>
+      <div class="sk-row"><div class="sk-top"><span class="sk-name">AI / LLM APIs</span><span class="sk-pct">70%</span></div><div class="sk-bar"><div class="sk-fill" data-w="70"></div></div></div>
+      <div class="sk-title" style="margin-top:32px;">// Tools I Use Daily</div>
+      <div class="tools-grid">
+        <div class="tool-box"><div class="tool-name">Blender</div><div class="tool-sub">3D Modeling & CAD</div></div>
+        <div class="tool-box"><div class="tool-name">Arduino IDE</div><div class="tool-sub">Firmware Dev</div></div>
+        <div class="tool-box"><div class="tool-name">VS Code</div><div class="tool-sub">Python / Scripts</div></div>
+        <div class="tool-box"><div class="tool-name">Cura / PrusaSlicer</div><div class="tool-sub">Print Slicing</div></div>
+        <div class="tool-box"><div class="tool-name">GitHub</div><div class="tool-sub">Version Control</div></div>
+        <div class="tool-box"><div class="tool-name">Multimeter</div><div class="tool-sub">Hardware Debug</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sh reveal" style="max-width:1300px;margin:0 auto;padding-top:80px;">
+  <div><div class="slabel">// Design Process</div><h2 class="stitle">CAD → Reality</h2></div>
+</div>
+<div class="cad-section">
+  <div class="cad-grid reveal">
+    <div class="cad-box"><img src="Screenshot 2026-05-15 223234.png" alt="QuadBot full assembly Blender"><div class="cad-lbl">QuadBot — Full Assembly · Blender 5.0 · 121 objects</div></div>
+    <div class="cad-box"><img src="Screenshot 2026-05-15 222737.png" alt="QuadBot body detail"><div class="cad-lbl">QuadBot — Body & servo mount detail</div></div>
+    <div class="cad-info" style="grid-column:span 2;">
+      <div class="slabel" style="margin-bottom:14px;">// Why CAD first?</div>
+      <div class="cad-h">Everything starts in Blender.</div>
+      <p class="cad-p">Before anything gets printed, every part lives in a Blender scene. I model to actual servo dimensions, account for print tolerances, test joint clearances, and verify everything fits. QuadBot has <strong>121+ objects</strong> across its collection hierarchy — body panels, leg segments, servo horns, brackets, and wire routing channels.</p>
+      <p class="cad-p">Catching a clearance problem in 3D costs nothing. Printing a part that doesn't fit costs hours of time and filament. CAD first, always.</p>
+    </div>
+  </div>
+</div>
+
+<div class="sh reveal" style="max-width:1300px;margin:0 auto;padding-bottom:32px;">
+  <div><div class="slabel">// Always Learning</div><h2 class="stitle">What I'm Into</h2></div>
+</div>
+<div class="cards-wrap">
+  <div class="cards-grid">
+    <div class="icard reveal"><div class="ic-icon">🦿</div><div class="ic-t">Biomechanics</div><div class="ic-d">Studying how insects and animals walk to design QuadBot's gait. Every leg phase, timing, and joint angle matters for smooth locomotion.</div></div>
+    <div class="icard reveal d1"><div class="ic-icon">🧠</div><div class="ic-t">Edge AI</div><div class="ic-d">Running AI inference on microcontrollers. The assistant project pushes me to optimize LLM calls and pipe responses to hardware in real time.</div></div>
+    <div class="icard reveal d2"><div class="ic-icon">⚡</div><div class="ic-t">Power Systems</div><div class="ic-d">Managing multiple servos drawing current simultaneously. I've learned about voltage regulators, caps, and why robots randomly reset (it's always the power supply).</div></div>
+    <div class="icard reveal"><div class="ic-icon">🖨️</div><div class="ic-t">Print Tolerances</div><div class="ic-d">FDM has quirks. I design 0.2mm clearance into press-fit joints, orient parts for layer strength, and pick the right infill for structural vs cosmetic pieces.</div></div>
+    <div class="icard reveal d1"><div class="ic-icon">📡</div><div class="ic-t">Sensor Fusion</div><div class="ic-d">Combining IMU, ultrasonic, and encoder data for better spatial awareness. Next step for QuadBot: self-correcting balance using feedback loops.</div></div>
+    <div class="icard reveal d2"><div class="ic-icon">🔧</div><div class="ic-t">Iteration</div><div class="ic-d">Every project has at least 3 physical prototypes. The arm went through 5 gripper versions. Failure is data — I document what broke and why, then fix it.</div></div>
+  </div>
+</div>
+
+<section id="contact">
+  <div class="contact-wrap">
+    <div class="contact-grid">
+      <div class="reveal">
+        <h2 class="cbig">Let's<br><span>Connect.</span></h2>
+        <p class="csub">Want to collaborate on a project, give feedback, or just talk robots and electronics? I'm always happy to chat with other makers, engineers, or anyone curious about what I'm building.</p>
+        <div class="ptags" style="gap:10px;"><span class="tag">Open to collabs</span><span class="tag">Competitions</span><span class="tag">Feedback welcome</span></div>
+      </div>
+      <div class="cbox reveal d1">
+        <a href="https://github.com/advit791" class="citem" target="_blank">
+          <div class="ci-icon">⌨️</div><div><div class="ci-label">GitHub</div><div class="ci-val">github.com/advit791</div></div>
+        </a>
+        <a href="mailto:advit791@gmail.com" class="citem">
+          <div class="ci-icon">✉️</div><div><div class="ci-label">Email</div><div class="ci-val">advit791@gmail.com</div></div>
+        </a>
+        <div class="citem" style="cursor:default;">
+          <div class="ci-icon">📍</div><div><div class="ci-label">Location</div><div class="ci-val">Hillsboro, Oregon</div></div>
         </div>
-        <div class="skill-item" style="--pct: 85%">
-          <div class="skill-name">Arduino / C++</div>
-          <div class="skill-sub">Firmware & embedded</div>
-        </div>
-        <div class="skill-item" style="--pct: 80%">
-          <div class="skill-name">3D Printing</div>
-          <div class="skill-sub">FDM prototyping</div>
-        </div>
-        <div class="skill-item" style="--pct: 75%">
-          <div class="skill-name">Python</div>
-          <div class="skill-sub">Scripting & APIs</div>
-        </div>
-        <div class="skill-item" style="--pct: 70%">
-          <div class="skill-name">Electronics</div>
-          <div class="skill-sub">Wiring & circuits</div>
-        </div>
-        <div class="skill-item" style="--pct: 65%">
-          <div class="skill-name">AI / APIs</div>
-          <div class="skill-sub">LLM integration</div>
+        <div class="citem" style="cursor:default;border-bottom:none;">
+          <div class="ci-icon">🎓</div><div><div class="ci-label">Status</div><div class="ci-val">Student · Age 14</div></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- BLENDER CAD SHOWCASE -->
-<div class="section-header reveal" style="padding-top: 80px;">
-  <div>
-    <div class="section-label">Design Process</div>
-    <h2 class="section-title">From CAD to Reality</h2>
-  </div>
-</div>
-<div class="blender-strip reveal">
-  <img class="blender-img" src="Screenshot_2026-05-15_223234.png" alt="QuadBot Blender model">
-  <div class="blender-info">
-    <div class="section-label" style="margin-bottom: 16px;">Blender 5.0</div>
-    <h3 style="font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.01em;">Everything starts as geometry.</h3>
-    <p style="color: var(--muted); font-size: 15px; line-height: 1.8; margin-bottom: 24px;">
-      Before a single wire is connected or a servo installed, every part lives in Blender. I model the full assembly — body, legs, brackets, mounts — and test fit and clearance in 3D before committing to a print.
-    </p>
-    <p style="color: var(--muted); font-size: 15px; line-height: 1.8;">
-      QuadBot alone has <strong style="color: var(--text);">121+ objects</strong> in its scene collection, each modeled to fit real-world servo dimensions and print tolerances.
-    </p>
-  </div>
-</div>
-<div class="blender-strip reveal" style="margin-bottom: 80px;">
-  <div class="blender-info">
-    <div class="section-label" style="margin-bottom: 16px;">Real Hardware</div>
-    <h3 style="font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.01em;">Then it gets messy.</h3>
-    <p style="color: var(--muted); font-size: 15px; line-height: 1.8; margin-bottom: 24px;">
-      Once the parts are printed, the real work begins — routing servo cables, connecting driver boards, soldering LEDs, and getting the firmware to talk to everything at once.
-    </p>
-    <p style="color: var(--muted); font-size: 15px; line-height: 1.8;">
-      The wire chaos is a feature. It means it's real.
-    </p>
-  </div>
-  <img class="blender-img" src="WhatsApp_Image_2026-05-15_at_10_30_02_PM.jpeg" alt="QuadBot real hardware">
-</div>
-
-<!-- CONTACT -->
-<section id="contact">
-  <div class="contact-section reveal">
-    <div class="contact-left">
-      <h2 class="contact-big">
-        Let's<br>
-        <span>Talk.</span>
-      </h2>
-      <p class="contact-text">
-        Want to collaborate, give feedback on a project, or just talk robots? I'm always down to connect with other builders and makers.
-      </p>
-    </div>
-    <div class="contact-links">
-      <a href="https://github.com" class="contact-link" target="_blank">
-        <span class="contact-link-icon">⌨</span>
-        GitHub — @advit
-      </a>
-      <a href="mailto:advit@example.com" class="contact-link">
-        <span class="contact-link-icon">✉</span>
-        Email me
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
 <footer>
-  <div class="footer-copy">© 2026 Advit. All projects, all mine.</div>
-  <div class="footer-made">Built with <span>⚡</span> and too much caffeine.</div>
+  <div class="flogo">ADVIT.DEV</div>
+  <div class="fcopy">© 2026 ADVIT — ALL PROJECTS BUILT FROM SCRATCH</div>
+  <div class="fcopy" style="color:var(--blue);">HILLSBORO, OR</div>
 </footer>
 
 <script>
-  // Custom cursor
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
+// Cursor
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function aR(){rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(aR);})();
+document.querySelectorAll('a,button,.icard,.proj-card,.proj-featured,.stat-box').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='translate(-50%,-50%) scale(2.5)';ring.style.width='60px';ring.style.height='60px';});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='translate(-50%,-50%) scale(1)';ring.style.width='36px';ring.style.height='36px';});
+});
 
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-  });
+// Particle BG
+const canvas=document.getElementById('bgCanvas'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function rs(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+rs();window.addEventListener('resize',rs);
+class P{constructor(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.r=Math.random()*1.5+.5;this.a=Math.random()*.4+.1;}up(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W)this.vx*=-1;if(this.y<0||this.y>H)this.vy*=-1;}dr(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(0,170,255,${this.a})`;ctx.fill();}}
+for(let i=0;i<100;i++)pts.push(new P());
+function frame(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.up();p.dr();});for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,170,255,${.08*(1-d/120)})`;ctx.lineWidth=.5;ctx.stroke();}}requestAnimationFrame(frame);}
+frame();
 
-  function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
+// Scroll reveal
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-  document.querySelectorAll('a, button, .project-card').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.transform = 'translate(-50%, -50%) scale(2)';
-      ring.style.width = '60px'; ring.style.height = '60px';
-    });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-      ring.style.width = '40px'; ring.style.height = '40px';
-    });
-  });
+// Count up
+function countUp(el,t){let s=0,d=1800,step=16,inc=t/(d/step);const tm=setInterval(()=>{s=Math.min(s+inc,t);el.textContent=Math.floor(s);if(s>=t){el.textContent=t+(t>10?'+':'');clearInterval(tm);}},step);}
+const co=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('[data-count]').forEach(el=>countUp(el,+el.dataset.count));co.unobserve(e.target);}});},{threshold:.3});
+document.querySelectorAll('.stats-row').forEach(el=>co.observe(el));
 
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 60);
-      }
-    });
-  }, { threshold: 0.1 });
-  reveals.forEach(el => observer.observe(el));
+// Skill bars
+const so=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.sk-fill').forEach(b=>setTimeout(()=>b.style.width=b.dataset.w+'%',200));so.unobserve(e.target);}});},{threshold:.2});
+const sk=document.getElementById('skills');if(sk)so.observe(sk);
+
+// QuadBot slideshow
+(function(){
+  const g=document.getElementById('qbG');if(!g)return;
+  const imgs=g.querySelectorAll('img'),dc=document.getElementById('qbDots');
+  let cur2=0,tmr;
+  imgs.forEach((_,i)=>{const d=document.createElement('div');d.className='gdot'+(i===0?' active':'');d.addEventListener('click',()=>show(i));dc.appendChild(d);});
+  function show(i){imgs[cur2].classList.remove('active');dc.children[cur2].classList.remove('active');cur2=i;imgs[cur2].classList.add('active');dc.children[cur2].classList.add('active');}
+  tmr=setInterval(()=>show((cur2+1)%imgs.length),3000);
+  g.addEventListener('mouseenter',()=>clearInterval(tmr));
+  g.addEventListener('mouseleave',()=>{tmr=setInterval(()=>show((cur2+1)%imgs.length),3000);});
+})();
+
+// Arm click-to-cycle
+(function(){
+  const srcs=[
+    'WhatsApp Image 2026-05-15 at 10.17.48 PM.jpeg',
+    'WhatsApp Image 2026-05-15 at 10.17.48 PM (1).jpeg',
+    'WhatsApp Image 2026-05-15 at 10.17.49 PM.jpeg',
+    'WhatsApp Image 2026-05-15 at 10.17.48 PM (2).jpeg'
+  ];
+  const w=document.getElementById('armG');if(!w)return;
+  const img=w.querySelector('img');let idx=0;
+  w.addEventListener('click',()=>{idx=(idx+1)%srcs.length;img.src=srcs[idx];});
+})();
 </script>
 </body>
 </html>
